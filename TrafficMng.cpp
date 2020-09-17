@@ -3,8 +3,8 @@
 using namespace std;
 
 class Authorisation {
-    
-public :
+
+public:
 
 };
 
@@ -30,78 +30,88 @@ public:
         id = count++;
         emergency = e;
         speed = rand() % 61;
-    };
+    }
     int getId() {
         return id;
-    };
+    }
     bool isEmergency() {
         return emergency ? true : false;
-    };
+    }
     int getSpeed() {
         return speed;
-    };
-}; 
+    }
+};
 
 class Input_sensor {
-    int newTraffic;
     int* A;
 public:
     Input_sensor() {
-        newTraffic = 0;
-    };
-    friend int* get_traffic();
-}; 
-int* get_traffic() {
+        A = new int[2];
+    }
+    int* getTraffic() {
         int tv, ev;
         cout << "Total new vehicles : ";
         cin >> tv;
         cout << "Emergency vehicles : ";
         cin >> ev;
-        int* A = new int[2];
         A[0] = tv; A[1] = ev;
         return A;
-    };
+    }
+};
 
 class traffic_light {
     string color;
 public:
     traffic_light() {
         color = "red";
-    };
+    }
     void changeLight(string c) {
         color = c;
-    };
-};
-struct lessthan{
-    bool operator()(const vehicle& lhs, const vehicle& rhs)
-    {
-    return lhs.emergency <= rhs.emergency;
     }
-}
-class traffic_lane {
-    int currentTraffic;
+};
+
+class traffic_lane : public Input_sensor{
+    int currentVehicles;
+    int currentEV;
     int speedLimit;
-    priority_queue<vehicle,vector<vehicle>, lessthan> pq;
-
+    queue<vehicle> qv;
 public:
-    friend class vehicle;
     traffic_lane(int sl) {
-        currentTraffic = 0;
+        currentVehicles = 0;
+        currentEV = 0;
         speedLimit = sl;
-    };
-    void push_queue(){
-      int* t= get_traffic();
-      for(int i=0;i<t[0];i++){
-          pq.push(vehicle());
-      }
-      for(int i=0;i<t[1];i++){
-          pq.push(vehicle(1));
-      }
     }
+    int getCurrentVehicles() {
+        return currentVehicles;
+    }
+    int getCurrentEV() {
+        return currentEV;
+    }
+    void updateTraffic() {
+        int* A = getTraffic();
+        for (int i = 0; i < A[1]; i++) {
+            vehicle* nv = new vehicle(1);
+            qv.push(*nv);
+        }
+        for (int i = 0; i < A[0]; i++) {
+            vehicle* nv = new vehicle(0);
+            qv.push(*nv);
+        }
+        currentVehicles = A[0];
+        currentEV = A[1];
+    }
+   
 };
 
+bool operator <(traffic_lane& l1,traffic_lane& l2){
+    if (l1.getCurrentEV() == l2.getCurrentEV()) {
+        return l1.getCurrentVehicles() < l2.getCurrentVehicles();
+    }
+    return l1.getCurrentEV() < l2.getCurrentEV();
+   
+}
 class Outgoing {
-
+    priority_queue<traffic_lane> pql;
 public:
 
 };
