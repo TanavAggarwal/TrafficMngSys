@@ -44,11 +44,14 @@ public:
 
 class Input_sensor {
     int newTraffic;
+    int* A;
 public:
     Input_sensor() {
         newTraffic = 0;
     };
-    int* get_traffic() {
+    friend int* get_traffic();
+}; 
+int* get_traffic() {
         int tv, ev;
         cout << "Total new vehicles : ";
         cin >> tv;
@@ -58,7 +61,6 @@ public:
         A[0] = tv; A[1] = ev;
         return A;
     };
-}; 
 
 class traffic_light {
     string color;
@@ -66,21 +68,36 @@ public:
     traffic_light() {
         color = "red";
     };
-    void changeLigth(string c) {
+    void changeLight(string c) {
         color = c;
     };
 };
-
+struct lessthan{
+    bool operator()(const vehicle& lhs, const vehicle& rhs)
+    {
+    return lhs.emergency <= rhs.emergency;
+    }
+}
 class traffic_lane {
     int currentTraffic;
     int speedLimit;
-    priority_queue<vehicle> Ql;
+    priority_queue<vehicle,vector<vehicle>, lessthan> pq;
+
 public:
+    friend class vehicle;
     traffic_lane(int sl) {
         currentTraffic = 0;
         speedLimit = sl;
     };
-
+    void push_queue(){
+      int* t= get_traffic();
+      for(int i=0;i<t[0];i++){
+          pq.push(vehicle());
+      }
+      for(int i=0;i<t[1];i++){
+          pq.push(vehicle(1));
+      }
+    }
 };
 
 class Outgoing {
