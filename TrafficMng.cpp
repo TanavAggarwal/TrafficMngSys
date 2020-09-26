@@ -1,11 +1,34 @@
 #include <iostream>
 #include<queue>
+#include<vector>
 using namespace std;
 
 class Authorisation {
-
+    vector<pair<string, string> > accounts;
 public:
-
+    void Register() {
+        string user, pass;
+        cout << "Enter username : ";
+        cin >> user;
+        cout << "Enter password : ";
+        cin >> pass;
+        accounts.push_back(make_pair(user, pass));
+    }
+    bool login() {
+        string user, pass;
+        cout << "Enter username : ";
+        cin >> user;
+        cout << "Enter password : ";
+        cin >> pass;
+        for (int i = 0; i < accounts.size(); i++) {
+            if (accounts[i].first == user && accounts[i].second == pass) {
+                cout << "Login successfull!" << endl;
+                return true;
+            }
+        }
+        cout << "Incorrect details, Try Again!" << endl;
+        return false;
+    }
 };
 
 class Alerts {
