@@ -165,7 +165,7 @@ int main() {
     Authorisation AU;
     AU.auth();
     cout << "***********************************************" << endl;
-    cout << "Press ENTER to continue........"; cin.get(); cin.get();
+    system("pause");
     system("cls");
 
     
