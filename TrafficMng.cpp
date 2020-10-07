@@ -7,6 +7,7 @@ class Authorisation {
     vector<pair<string, string> > accounts;
 public:
     void Register() {
+        cout << "ENTER DETAILS TO REGISTER YOURSELF - " << endl;
         string user, pass;
         cout << "Enter username : ";
         cin >> user;
@@ -15,6 +16,7 @@ public:
         accounts.push_back(make_pair(user, pass));
     }
     bool login() {
+        cout << "ENTER DETAILS TO LOGIN - " << endl;
         string user, pass;
         cout << "Enter username : ";
         cin >> user;
@@ -140,6 +142,19 @@ public:
 };
 
 int main() {
+    cout << "** TRAFFIC MANAGEMENT SYSTEM **" << endl << endl;
+    cout << "Authorise yourself to start simulation -" << endl;
+    l1:cout << "Press 1 to register OR Press 2 to login : ";
+    int x; cin >> x;
+    Authorisation AU;
+    if (x == 1) {
+        AU.Register();
+        goto l1;
+    }
+    else {
+        if (AU.login() == false) goto l1;
+    }
+    cout << "\n\n********************************\n\n";
 
     return 0;
 }
