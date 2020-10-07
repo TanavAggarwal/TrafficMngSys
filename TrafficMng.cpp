@@ -1,36 +1,95 @@
 #include <iostream>
 #include<queue>
 #include<vector>
+#include<string>
+#include<fstream>
 using namespace std;
 
 class Authorisation {
-    vector<pair<string, string> > accounts;
-public:
-    void Register() {
-        cout << "ENTER DETAILS TO REGISTER YOURSELF - " << endl;
-        string user, pass;
-        cout << "Enter username : ";
-        cin >> user;
-        cout << "Enter password : ";
-        cin >> pass;
-        accounts.push_back(make_pair(user, pass));
-    }
-    bool login() {
-        cout << "ENTER DETAILS TO LOGIN - " << endl;
-        string user, pass;
-        cout << "Enter username : ";
-        cin >> user;
-        cout << "Enter password : ";
-        cin >> pass;
-        for (int i = 0; i < accounts.size(); i++) {
-            if (accounts[i].first == user && accounts[i].second == pass) {
-                cout << "Login successfull!" << endl;
-                return true;
-            }
-        }
-        cout << "Incorrect details, Try Again!" << endl;
-        return false;
-    }
+    public:
+    int auth(){
+	label:
+	string p,q,w;
+	int x;
+    string s;
+	cin>>x;
+	if(x==1){
+
+			
+  			ofstream fout;
+  			cout<<"ENTER YOUR USERNAME"<<endl;
+  			cin>>s;
+  			cout<<"ENTER YOUR PASSWORD"<<endl;
+  			cin>>p;
+  			s=s+p;
+  			ifstream fin;
+  			string line;
+  			int offset=0;
+  			fin.open("myfile.txt");
+  			if(fin.is_open())
+  			{
+  				while(!fin.eof())
+  				{
+  					getline(fin,line);
+					if(line.find(s,0)!=-1)
+					{
+						cout<<"sorry! this username is not available"<<endl;
+						cout<<"Press any key to go to Home Page"<<endl;
+						char kk;
+						cin>>kk;
+						goto label;
+						//break;
+					}
+				}
+			}
+  			fin.close();
+  			fout.open("myfile.txt",ios::app);
+  			fout<<s+"\n";
+  			fout.close();
+	}
+		else if(x==2){
+
+			string line;
+			
+  			ifstream fin;
+  			int offset=0;
+  			cout<<"ENTER YOUR USERNAME"<<endl;
+  			cin>>q;
+  			cout<<"ENTER YOUR PASSWORD"<<endl;
+  			cin>>w;
+  			q=q+w;
+  			fin.open("myfile.txt");
+  			if(fin.is_open())
+  			{
+  				while(!fin.eof())
+  				{
+  					getline(fin,line);
+					if(line.find(q,0)!=-1)
+					{
+						cout<<"you are logged in"<<endl;
+						offset=1;
+						break;
+						  }
+				}
+				if(offset==0)
+				{
+					cout<<"sorry you are unauthorised!!"<<endl;
+					cout<<"Press 1 and enter to go to home page"<<endl;
+					//getch();
+					char o;
+					cin>>o;
+					goto label;
+								  }
+			}
+  			fin.close();
+	}
+	else if(x==3){
+		return 0;
+	}else{
+	    goto label;
+	}
+    return 0;
+}
 };
 
 class Alerts {
@@ -145,15 +204,9 @@ int main() {
     cout << "** TRAFFIC MANAGEMENT SYSTEM **" << endl << endl;
     cout << "Authorise yourself to start simulation -" << endl;
     l1:cout << "Press 1 to register OR Press 2 to login : ";
-    int x; cin >> x;
+    
     Authorisation AU;
-    if (x == 1) {
-        AU.Register();
-        goto l1;
-    }
-    else {
-        if (AU.login() == false) goto l1;
-    }
+    AU.auth();
     cout << "\n\n********************************\n\n";
 
     return 0;
