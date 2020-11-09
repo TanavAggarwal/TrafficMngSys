@@ -2,6 +2,7 @@
 #include<queue>
 #include<string>
 #include<fstream>
+#include<ctime>
 #include<vector>
 #define HEADER "**********\t\t\t    **********\n\n\t   TRAFFIC MANAGEMENT SYSTEM\t   \n\n**********\t\t\t    **********\n\n"
 using namespace std;
@@ -80,22 +81,16 @@ public:
 
 };
 
-class pedestrian_crossing {
-
-public:
-
-};
-
 class vehicle {
     int id;
     int emergency;
     int speed;
+    static int i;
 public:
-    //static int count;
     vehicle(int e = 0) {
-        id = 1;
+        id = i++;
         emergency = e;
-        speed = rand() % 61;
+        speed = 1 + rand() % 71;                //Vehicles with speed 1 - 70
     }
     int getId() {
         return id;
@@ -107,6 +102,7 @@ public:
         return speed;
     }
 };
+int vehicle::i = 0;
 
 class Input_sensor {
     int* A;
@@ -169,39 +165,41 @@ public:
         currentVehicles = A[0];
         currentEV = A[1];
     }
-
+    friend bool operator<(traffic_lane& l1,traffic_lane& l2);
 };
 
-/*bool operator <(traffic_lane& l1,traffic_lane& l2){
-    if (l1.getCurrentEV() == l2.getCurrentEV()) {
-        return l1.getCurrentVehicles() < l2.getCurrentVehicles();
-    }
-    return l1.getCurrentEV() < l2.getCurrentEV();
-}*/
+bool operator <(const traffic_lane& l1, const traffic_lane& l2){
+    if(l1.currentEV != l2.currentEV)
+        return l1.currentEV < l2.currentEV;
+    else
+        return l1.currentVehicles < l2.currentVehicles;
+}
 class Outgoing {
-    queue<traffic_lane> pql;
+    priority_queue<traffic_lane> pql;
 public:
     Outgoing(traffic_lane l1, traffic_lane l2, traffic_lane l3, traffic_lane l4){
         pql.push(l1); pql.push(l2); pql.push(l3); pql.push(l4);
     }
-    void startTraffic(){
+    void startTraffic() {
         cout << "Started\n";
         while(!pql.empty()){
-            traffic_lane cl = pql.front();
+            traffic_lane cl = pql.top();
             pql.pop();
             cl.changeLight("Green");
             cout << "Lane " << cl.laneNo << " light turned " << cl.color << endl;
+            cout << "Total Vehicles in Lane : " << cl.currentVehicles << " , Emergency Vehicles : " << cl.currentEV << endl;
             int vehToExit = 30;
             while(vehToExit>0 && cl.currentVehicles > 0){
                 vehicle cv = cl.qv.front();
                 if(cv.isEmergency()){
                     cl.qv.pop();
                     cl.currentVehicles--;
+                    cl.currentEV--;
                 }
                 else{
                     if(cv.getSpeed() > cl.speedLimit){
-                        ofstream of("OverSpeeding.txt", ios::app);
-                        of << cv.getId() << endl;
+                        ofstream of("OverSpeeding.txt");
+                        of << "E-challan for Vehicle with ID : " << cv.getId() << " for violating the speed limit in lane " << cl.laneNo << endl;
                         of.close();
                     }
                     cl.qv.pop();
@@ -212,7 +210,7 @@ public:
             cout << "Lane " << cl.laneNo << " vehicles started movement" << endl;
             cl.changeLight("Red");
             cout << "Lane " << cl.laneNo << " light turned " << cl.color << endl;
-            cout << "Lane " << cl.laneNo << " vehicles remaining : " << cl.currentVehicles << endl << endl;
+            cout << "Lane " << cl.laneNo << " vehicles remaining : " << cl.currentVehicles << " , Emergency Vehicles : " << cl.currentEV << endl << endl;
             system("pause");
             if(cl.currentVehicles > 0) pql.push(cl);
         }
@@ -226,6 +224,7 @@ int main() {
     system("pause");
     system("cls");
 
+    srand(time(0));
     traffic_lane l1(1,50),l2(2,55),l3(3,60),l4(4,45);           //Lanes with respective speed limits
 
     while(1){
