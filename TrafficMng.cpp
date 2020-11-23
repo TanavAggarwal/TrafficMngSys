@@ -75,12 +75,6 @@ public:
     }
 };
 
-class Alerts {
-
-public:
-
-};
-
 class vehicle {
     int id;
     int emergency;
@@ -90,7 +84,7 @@ public:
     vehicle(int e = 0) {
         id = i++;
         emergency = e;
-        speed = 1 + rand() % 71;                //Vehicles with speed 1 - 70
+        speed = 10 + rand() % 51;                //Vehicles with speed 10 - 60
     }
     int getId() {
         return id;
@@ -198,7 +192,7 @@ public:
                 }
                 else{
                     if(cv.getSpeed() > cl.speedLimit){
-                        ofstream of("OverSpeeding.txt");
+                        ofstream of("OverSpeeding.txt", ios::app);
                         of << "E-challan for Vehicle with ID : " << cv.getId() << " for violating the speed limit in lane " << cl.laneNo << endl;
                         of.close();
                     }
@@ -217,20 +211,31 @@ public:
     }
 };
 
+void printEChallan(){
+    ifstream iff("OverSpeeding.txt");
+    string s;
+    cout << "Generated E-challans are : " << endl;
+    while(getline(iff, s)){
+        cout << s << endl;
+    }
+    cout << endl;
+    iff.close();
+}
+
 int main() {
     Authorisation AU;
-    AU.auth();
+    aul:AU.auth();
     cout << "***********************************************" << endl << endl;
     system("pause");
     system("cls");
 
     srand(time(0));
-    traffic_lane l1(1,50),l2(2,55),l3(3,60),l4(4,45);           //Lanes with respective speed limits
+    traffic_lane l1(1,40),l2(2,35),l3(3,40),l4(4,45);           //Lanes with respective speed limits
 
     while(1){
         system("cls");
         cout << HEADER;
-        la:cout << "Menu :\n\n1.Update Traffic\n2.Start simulation\n3.Logout\n" << endl;
+        la:cout << "Menu :\n\n1.Update Traffic\n2.Start simulation\n3.Display Generated Challans\n4.Logout\n" << endl;
         cout << "Select option : ";
         int c; cin >> c;
         if(c==1){
@@ -244,20 +249,33 @@ int main() {
             l3.updateTraffic();
             cout << "Input Lane 4 data :\n";
             l4.updateTraffic();
+            system("pause");
         }
         else if(c==2){
             system("cls");
             cout << HEADER;
             Outgoing og(l1,l2,l3,l4);
             og.startTraffic();
+            system("pause");
         }
         else if(c==3){
             system("cls");
-            cout << "Thank You" << endl;
-            _Exit(10);
+            cout << HEADER;
+            printEChallan();
+            system("pause");
+        }
+        else if(c==4){
+            system("cls");
+            cout << "Logged Out Successfully!" << endl << endl;
+            system("pause");
+            system("cls");
+            goto aul;
         }
         else{
             cout << "!! Select a valid option (1-3) !!" << endl << endl;
+            system("pause");
+            system("cls");
+            cout << HEADER;
             goto la;
         }
     }
