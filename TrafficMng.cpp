@@ -75,6 +75,24 @@ public:
     }
 };
 
+class Alerts {
+public:
+	int it;
+	void checkd() {
+        cout<<"Enter 1: If NO problem in the lane\n";
+		cout<<"Enter 2: If any problem in the lane\n";
+		cout<<"Choose option :";
+		cin>>it;
+	}
+	void get(int wi) {
+		cout.width(wi);
+        cout<<"Enter 1: If problem solved\n";
+		cout.width(wi);
+        cout<<"Enter 2:If problem still occurs\n";
+	    cin>>it;
+	}
+};
+
 class vehicle {
     int id;
     int emergency;
@@ -98,7 +116,7 @@ public:
 };
 int vehicle::i = 0;
 
-class Input_sensor {
+class Input_sensor: public Alerts {
     int* A;
 public:
     Input_sensor() {
@@ -110,6 +128,7 @@ public:
         cin >> tv;
         cout << "Emergency vehicles : ";
         cin >> ev;
+        checkd();
         A[0] = tv; A[1] = ev;
         return A;
     }
@@ -174,39 +193,108 @@ public:
     Outgoing(traffic_lane l1, traffic_lane l2, traffic_lane l3, traffic_lane l4){
         pql.push(l1); pql.push(l2); pql.push(l3); pql.push(l4);
     }
+    void printDetail(traffic_lane dl) {
+        if(dl.laneNo==1){
+            cout << "Started\n";
+    	    system("CLS");
+    	    cout<<"\tLane No-1 "<<"\t\t\t\tLane NO-2 "<<"\t\t\t\tLane NO-3 "<<"\t\t\t\tLane NO-4"<<"\n";
+            dl.changeLight("Green");
+            cout<<"\tLane turned "<<dl.color<<"\t\t\t\tLane turned Red"<<"\t\t\t\tLane turned Red"<<"\t\t\t\tLane turned Red"<<"\n";
+            if(dl.it==2) dl.get(0);
+            if(dl.it==2){
+                pql.push(dl);
+    	        system("pause");
+            }
+            else{
+                changeDetail(dl,0);
+            }
+        }
+        else if(dl.laneNo==2){
+	           system("CLS");
+	           cout<<"\tLane No-1 "<<"\t\t\t\tLane NO-2 "<<"\t\t\t\tLane NO-3 "<<"\t\t\t\tLane NO-4 "<<"\n";
+               dl.changeLight("Green");
+               cout<<"\tLane turned Red"<<"\t\t\t\tLane turned "<<dl.color<<"\t\t\t\tLane turned Red"<<"\t\t\t\tLane turned Red"<<"\n";
+               if(dl.it==2) dl.get(75);
+               if(dl.it==2) {
+    	              pql.push(dl);
+    	              system("pause");
+	           }
+	           else {
+                   changeDetail(dl,40);
+               }
+        }
+        else if(dl.laneNo==3){
+	            cout << "Started\n";
+	            system("CLS");
+	            cout<<"\tLane No-1 "<<"\t\t\t\tLane NO-2 "<<"\t\t\t\tLane NO-3 "<<"\t\t\t\tLane NO-4 "<<"\n";
+                dl.changeLight("Green");
+                cout<<"\tLane turned Red"<<"\t\t\t\tLane turned Red"<<"\t\t\t\tLane turned "<<dl.color<<"\t\t\t\tLane turned Red\n";
+                if(dl.it==2) dl.get(125);
+                if(dl.it==2) {
+                    pql.push(dl);
+    	            system("pause");
+	            }
+	            else
+	               changeDetail(dl,90);
+        }
+        else if(dl.laneNo==4){
+	           cout << "Started\n";
+	           system("CLS");
+	           cout<<"\tLane No-1 "<<"\t\t\t\tLane NO-2 "<<"\t\t\t\tLane NO-3 "<<"\t\t\t\tLane NO-4 "<<"\n";
+               dl.changeLight("Green");
+               cout<<"\tLane turned Red"<<"\t\t\t\tLane turned Red"<<"\t\t\t\tLane turned Red"<<"\t\t\t\tLane turned "<<dl.color<<"\n";
+               if(dl.it==2) dl.get(175);
+               if(dl.it==2) {
+    	            pql.push(dl);
+    	            system("pause");
+                }
+	            else
+	               changeDetail(dl,140);
+        }
+	}
+	void changeDetail(traffic_lane cl,int wi) {
+        cout.width(wi+20);
+        cout << " Total Vehicles in Lane : " << cl.currentVehicles<<endl;
+        cout.width(wi+17);
+		cout << " Emergency Vehicles : " << cl.currentEV << endl;
+        int vehToExit = 30;
+        while(vehToExit>0 && cl.currentVehicles > 0){
+            vehicle cv = cl.qv.front();
+            if(cv.isEmergency()){
+                cl.qv.pop();
+                cl.currentVehicles--;
+                cl.currentEV--;
+            }
+            else{
+                if(cv.getSpeed() > cl.speedLimit){
+                    ofstream of("OverSpeeding.txt", ios::app);
+                    of << "E-challan generated for Vehicle with ID : " << cv.getId() << " for violating the speed limit in lane " << cl.laneNo << endl;
+                    of.close();
+                }
+                cl.qv.pop();
+                cl.currentVehicles--;
+            }
+            vehToExit--;
+        }
+        cout.width(wi);
+        cout << "Lane " << cl.laneNo << " vehicles started moving..." << endl;
+        cout.width(wi);
+        cl.changeLight("Red");
+        cout.width(wi);
+        cout << "Lane " << cl.laneNo << " light turned " << cl.color << endl;
+        cout.width(wi);
+        cout << "Lane " << cl.laneNo << " vehicles remaining : " << cl.currentVehicles<<endl;
+        cout.width(wi+17);
+		cout << " Emergency Vehicles : " << cl.currentEV << endl << endl;
+        system("pause");
+        if(cl.currentVehicles > 0) pql.push(cl);
+    }
     void startTraffic() {
         cout << "Started\n";
         while(!pql.empty()){
             traffic_lane cl = pql.top();
             pql.pop();
-            cl.changeLight("Green");
-            cout << "Lane " << cl.laneNo << " light turned " << cl.color << endl;
-            cout << "Total Vehicles in Lane : " << cl.currentVehicles << " , Emergency Vehicles : " << cl.currentEV << endl;
-            int vehToExit = 30;
-            while(vehToExit>0 && cl.currentVehicles > 0){
-                vehicle cv = cl.qv.front();
-                if(cv.isEmergency()){
-                    cl.qv.pop();
-                    cl.currentVehicles--;
-                    cl.currentEV--;
-                }
-                else{
-                    if(cv.getSpeed() > cl.speedLimit){
-                        ofstream of("OverSpeeding.txt", ios::app);
-                        of << "E-challan for Vehicle with ID : " << cv.getId() << " for violating the speed limit in lane " << cl.laneNo << endl;
-                        of.close();
-                    }
-                    cl.qv.pop();
-                    cl.currentVehicles--;
-                }
-                vehToExit--;
-            }
-            cout << "Lane " << cl.laneNo << " vehicles started movement" << endl;
-            cl.changeLight("Red");
-            cout << "Lane " << cl.laneNo << " light turned " << cl.color << endl;
-            cout << "Lane " << cl.laneNo << " vehicles remaining : " << cl.currentVehicles << " , Emergency Vehicles : " << cl.currentEV << endl << endl;
-            system("pause");
-            if(cl.currentVehicles > 0) pql.push(cl);
+            printDetail(cl);
         }
     }
 };
@@ -230,7 +318,7 @@ int main() {
     system("cls");
 
     srand(time(0));
-    traffic_lane l1(1,40),l2(2,35),l3(3,40),l4(4,45);           //Lanes with respective speed limits
+    traffic_lane l1(1,50),l2(2,45),l3(3,40),l4(4,45);           //Lanes with respective speed limits
 
     while(1){
         system("cls");
@@ -241,13 +329,13 @@ int main() {
         if(c==1){
             system("cls");
             cout << HEADER;
-            cout << "Input Lane 1 data :\n";
+            cout << "\nInput Lane 1 data :\n";
             l1.updateTraffic();
-            cout << "Input Lane 2 data :\n";
+            cout << "\nInput Lane 2 data :\n";
             l2.updateTraffic();
-            cout << "Input Lane 3 data :\n";
+            cout << "\nInput Lane 3 data :\n";
             l3.updateTraffic();
-            cout << "Input Lane 4 data :\n";
+            cout << "\nInput Lane 4 data :\n";
             l4.updateTraffic();
             system("pause");
         }
